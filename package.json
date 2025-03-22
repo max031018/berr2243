@@ -1,0 +1,23 @@
+{
+  "name": "databas-(java)",
+  "version": "1.0.0",
+  "description": "exercise 1 W1",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/max031018/berr2243.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/max031018/berr2243/issues"
+  },
+  "homepage": "https://github.com/max031018/berr2243#readme",
+  "dependencies": {
+    "mongodb": "^6.15.0"
+  }
+}
