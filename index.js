@@ -1,27 +1,68 @@
 const { MongoClient } = require('mongodb');
 
-async function main() {
-    // Replace <connection-string> with your MongoDB URI
-    const uri = "mongodb://localhost:27017" || "<atlas-connection-string>";
-    const client = new MongoClient(uri);
+const uri = "mongodb://localhost:27017"; // Connect to local MongoDB
+const client = new MongoClient(uri);
 
+const drivers = [ 
+    {
+        name: "Max",  
+        vehicleType: "Sedan",
+        isAvailable: true,
+        rating: 4.8
+    },
+    {
+        name: "Kendryck", 
+        vehicleType: "SUV",
+        isAvailable: false,
+        rating: 4.5
+    }
+];
+
+drivers.push
+({
+    name: "Messi",
+    vehicleType: "Truck",
+    isAvailable: true,
+    rating: 4.9
+});
+
+console.log(drivers); 
+drivers.forEach(drivers => console.log(drivers.name));
+
+async function run() {
     try {
         await client.connect();
-        console.log("Connected to MongoDB!");
+        const myDB = client.db("testDB"); 
+        const myColl = myDB.collection("drivers");    
+        
+        const result = await myColl.insertMany(drivers); // Insert all drivers
+        console.log(`New drivers created. Count: ${result.insertedCount}`); 
+        
+        const availableDrivers = await myColl.find({
+            isAvailable: true,
+            rating: { $gte: 4.5 }
+        }).toArray();
+        console.log("Available drivers:", availableDrivers);
 
-        const db = client.db("testDB");
-        const collection = db.collection("users");
+        const updateResults = await myColl.updateOne(
+            { name: "Kendryck" },
+            { $inc: { rating: 0.1 } }
+        );
+        console.log(`Driver updated with result:`, updateResults);
 
-        // Insert a document
-        await collection.insertOne({ name: "Alice", age: 25 });
-        console.log("Document inserted!");
+        const deleteResults = await myColl.deleteOne({ isAvailable: false})
+        console.log ('Driver deleted with results :', deleteResults);
 
-        // Query the document
-        const result = await collection.findOne({ name: "Alice" });
-        console.log("Query result:", result);
+    } catch (err) {
+        console.error("Error:", err);
     } finally {
         await client.close();
+        console.log("Database connection closed.");
     }
 }
 
-main().catch(console.error);
+run();
+
+
+
+
