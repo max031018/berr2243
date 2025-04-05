@@ -1,3 +1,3 @@
 # berr2243
 
-exercise 1 W1
+exercise 2 W2
