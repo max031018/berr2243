@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrabDB Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            color: var(--secondary);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: var(--accent);
+            font-weight: 300;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-title {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            transition: border 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.2);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: var(--light);
+            color: var(--dark);
+            border: 1px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e9ecef;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #d1145a;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #3ab0d9;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: #f1f3f5;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-available {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-booked {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-in-progress {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-completed {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+        
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>GrabDB Management</h1>
+            <p class="subtitle">Manage Users and Rides with Ease</p>
+        </header>
+        
+        <!-- User Section -->
+        <div class="card">
+            <h2 class="card-title">User Management</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" required>
+                </div>
+            </div>
+            <div class="flex-center">
+                <button class="btn btn-primary" onclick="addUser()">Add User</button>
+                <button class="btn btn-secondary" onclick="loadUsers()">Refresh Users</button>
+            </div>
+            
+            <div id="response"></div>
+            
+            <div class="table-responsive">
+                <table id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Date of Birth</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Rides Section -->
+        <div class="card">
+            <h2 class="card-title">Ride Management</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="pickup">Pickup Location</label>
+                    <input type="text" id="pickup" required>
+                </div>
+                <div class="form-group">
+                    <label for="dropoff">Dropoff Location</label>
+                    <input type="text" id="dropoff" required>
+                </div>
+                <div class="form-group">
+                    <label for="driverId">Driver ID</label>
+                    <input type="text" id="driverId" required>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status">
+                        <option value="available">Available</option>
+                        <option value="booked">Booked</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex-center">
+                <button class="btn btn-primary" onclick="addRide()">Add Ride</button>
+                <button class="btn btn-secondary" onclick="loadRides()">Refresh Rides</button>
+            </div>
+            
+            <div id="rideResponse"></div>
+            
+            <div class="table-responsive">
+                <table id="ridesTable">
+                    <thead>
+                        <tr>
+                            <th>Pickup</th>
+                            <th>Dropoff</th>
+                            <th>Driver ID</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // User functions
+        async function addUser() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const dob = document.getElementById('dob').value;
+            const phone = document.getElementById('phone').value;
+            
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = '';
+            
+            if (!name || !email || !dob || !phone) {
+                showAlert(responseDiv, 'Please fill in all fields', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:3000/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        dateOfBirth: dob,
+                        phoneNumber: phone
+                    }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showAlert(responseDiv, `User added successfully! ID: ${data._id}`, 'success');
+                    loadUsers();
+                    
+                    // Clear the form
+                    document.getElementById('name').value = '';
+                    document.getElementById('email').value = '';
+                    document.getElementById('dob').value = '';
+                    document.getElementById('phone').value = '';
+                } else {
+                    showAlert(responseDiv, `Error: ${data.error || 'Failed to add user'}`, 'error');
+                }
+            } catch (error) {
+                showAlert(responseDiv, `Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('http://localhost:3000/users');
+                const users = await response.json();
+                
+                const tbody = document.querySelector('#usersTable tbody');
+                tbody.innerHTML = '';
+                
+                users.forEach(user => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${user.name || ''}</td>
+                        <td>${user.email || ''}</td>
+                        <td>${user.phoneNumber || ''}</td>
+                        <td>${user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : ''}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-success btn-sm" onclick="editUser('${user._id}')">Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteUser('${user._id}')">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                showAlert(document.getElementById('response'), `Error loading users: ${error.message}`, 'error');
+            }
+        }
+
+        async function editUser(id) {
+            const newName = prompt("Enter new name:");
+            const newEmail = prompt("Enter new email:");
+            
+            if (newName && newEmail) {
+                try {
+                    const response = await fetch(`http://localhost:3000/users/${id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            name: newName,
+                            email: newEmail
+                        }),
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        showAlert(document.getElementById('response'), 'User updated successfully!', 'success');
+                        loadUsers();
+                    } else {
+                        showAlert(document.getElementById('response'), `Error: ${data.error || 'Failed to update user'}`, 'error');
+                    }
+                } catch (error) {
+                    showAlert(document.getElementById('response'), `Network error: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function deleteUser(id) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                try {
+                    const response = await fetch(`http://localhost:3000/users/${id}`, {
+                        method: 'DELETE',
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        showAlert(document.getElementById('response'), 'User deleted successfully!', 'success');
+                        loadUsers();
+                    } else {
+                        showAlert(document.getElementById('response'), `Error: ${data.error || 'Failed to delete user'}`, 'error');
+                    }
+                } catch (error) {
+                    showAlert(document.getElementById('response'), `Network error: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // Ride functions
+        async function addRide() {
+            const pickup = document.getElementById('pickup').value;
+            const dropoff = document.getElementById('dropoff').value;
+            const driverId = document.getElementById('driverId').value;
+            const status = document.getElementById('status').value;
+            
+            const responseDiv = document.getElementById('rideResponse');
+            responseDiv.innerHTML = '';
+            
+            if (!pickup || !dropoff || !driverId) {
+                showAlert(responseDiv, 'Please fill in all required fields', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:3000/rides', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        pickupLocation: pickup,
+                        dropoffLocation: dropoff,
+                        driverId: driverId,
+                        status: status,
+                        available: status === 'available'
+                    }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showAlert(responseDiv, `Ride added successfully! ID: ${data._id}`, 'success');
+                    loadRides();
+                    
+                    // Clear the form
+                    document.getElementById('pickup').value = '';
+                    document.getElementById('dropoff').value = '';
+                    document.getElementById('driverId').value = '';
+                } else {
+                    showAlert(responseDiv, `Error: ${data.error || 'Failed to add ride'}`, 'error');
+                }
+            } catch (error) {
+                showAlert(responseDiv, `Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadRides() {
+            try {
+                const response = await fetch('http://localhost:3000/rides');
+                const rides = await response.json();
+                
+                const tbody = document.querySelector('#ridesTable tbody');
+                tbody.innerHTML = '';
+                
+                rides.forEach(ride => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${ride.pickupLocation || ''}</td>
+                        <td>${ride.dropoffLocation || ''}</td>
+                        <td>${ride.driverId || ''}</td>
+                        <td><span class="status-badge status-${ride.status.replace('-','')}">${ride.status}</span></td>
+                        <td class="action-buttons">
+                            <button class="btn btn-success btn-sm" onclick="editRide('${ride._id}')">Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteRide('${ride._id}')">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                showAlert(document.getElementById('rideResponse'), `Error loading rides: ${error.message}`, 'error');
+            }
+        }
+
+        async function editRide(id) {
+            const newStatus = prompt("Enter new status (available, booked, in-progress, completed, cancelled):");
+            if (newStatus) {
+                try {
+                    const response = await fetch(`http://localhost:3000/rides/${id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            status: newStatus,
+                            available: newStatus === 'available'
+                        }),
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        showAlert(document.getElementById('rideResponse'), 'Ride updated successfully!', 'success');
+                        loadRides();
+                    } else {
+                        showAlert(document.getElementById('rideResponse'), `Error: ${data.error || 'Failed to update ride'}`, 'error');
+                    }
+                } catch (error) {
+                    showAlert(document.getElementById('rideResponse'), `Network error: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function deleteRide(id) {
+            if (confirm('Are you sure you want to delete this ride?')) {
+                try {
+                    const response = await fetch(`http://localhost:3000/rides/${id}`, {
+                        method: 'DELETE',
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        showAlert(document.getElementById('rideResponse'), 'Ride deleted successfully!', 'success');
+                        loadRides();
+                    } else {
+                        showAlert(document.getElementById('rideResponse'), `Error: ${data.error || 'Failed to delete ride'}`, 'error');
+                    }
+                } catch (error) {
+                    showAlert(document.getElementById('rideResponse'), `Network error: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // Helper function
+        function showAlert(element, message, type) {
+            element.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                </div>
+            `;
+        }
+
+        // Load data when page loads
+        window.onload = function() {
+            loadUsers();
+            loadRides();
+        };
+    </script>
+</body>
+</html>
