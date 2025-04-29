@@ -1,68 +1,63 @@
-const { MongoClient } = require('mongodb');
+const express = require('express');
+const bcrypt = require('bcrypt');
+const app = express();
+const port = 3000;
 
-const uri = "mongodb://localhost:27017"; // Connect to local MongoDB
-const client = new MongoClient(uri);
+// In-memory "database" (for demonstration only)
+const users = [];
 
-const drivers = [ 
-    {
-        name: "Max",  
-        vehicleType: "Sedan",
-        isAvailable: true,
-        rating: 4.8
-    },
-    {
-        name: "Kendryck", 
-        vehicleType: "SUV",
-        isAvailable: false,
-        rating: 4.5
-    }
-];
+app.use(express.json());
 
-drivers.push
-({
-    name: "Messi",
-    vehicleType: "Truck",
-    isAvailable: true,
-    rating: 4.9
+app.get('/', (req, res) => {
+    res.send('Hello World!');
 });
 
-console.log(drivers); 
-drivers.forEach(drivers => console.log(drivers.name));
-
-async function run() {
+// Registration endpoint
+app.post('/register', async (req, res) => {
     try {
-        await client.connect();
-        const myDB = client.db("testDB"); 
-        const myColl = myDB.collection("drivers");    
+        const { username, password } = req.body;
         
-        const result = await myColl.insertMany(drivers); // Insert all drivers
-        console.log(`New drivers created. Count: ${result.insertedCount}`); 
+        // Check if user already exists
+        if (users.find(user => user.username === username)) {
+            return res.status(400).send('User already exists');
+        }
         
-        const availableDrivers = await myColl.find({
-            isAvailable: true,
-            rating: { $gte: 4.5 }
-        }).toArray();
-        console.log("Available drivers:", availableDrivers);
-
-        const updateResults = await myColl.updateOne(
-            { name: "Kendryck" },
-            { $inc: { rating: 0.1 } }
-        );
-        console.log(`Driver updated with result:`, updateResults);
-
-        const deleteResults = await myColl.deleteOne({ isAvailable: false})
-        console.log ('Driver deleted with results :', deleteResults);
-
-    } catch (err) {
-        console.error("Error:", err);
-    } finally {
-        await client.close();
-        console.log("Database connection closed.");
+        // Hash password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        
+        // Store user
+        users.push({ username, password: hashedPassword });
+        
+        res.status(201).send('User registered successfully');
+    } catch (error) {
+        res.status(500).send('Error registering user');
     }
-}
+});
 
-run();
+// Login endpoint
+app.post('/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        
+        // Find user
+        const user = users.find(user => user.username === username);
+        if (!user) {
+            return res.status(401).send('Invalid credentials');
+        }
+        
+        // Compare passwords
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).send('Invalid credentials');
+        }
+        
+        res.send('Login successful');
+    } catch (error) {
+        res.status(500).send('Error during login');
+    }
+});
 
-
-
-
+app.listen(port, () => {
+    console.log(`Server listening at http://localhost:${port}`);
+});
